@@ -1,7 +1,6 @@
 name: Infisical
 
 services:
-
   db:
     image: postgres:${POSTGRES_VERSION}-alpine
     container_name: infisical-db
