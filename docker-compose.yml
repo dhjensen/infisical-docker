@@ -1,0 +1,78 @@
+name: Infisical
+
+services:
+  db:
+    image: postgres:${POSTGRES_VERSION}-alpine
+    container_name: infisical-db
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - POSTGRES_DB
+    networks:
+      - db
+    restart: unless-stopped
+    healthcheck:
+      test: "pg_isready --username=${POSTGRES_USER} && psql --username=${POSTGRES_USER} --list"
+      interval: 5s
+      timeout: 10s
+      retries: 10
+    labels:
+      - wud.tag.include=^14\.\d+-alpine$$
+      - traefik.enable=false
+  
+  infisical:
+    image: infisical/infisical:v${INFISICAL_VERSION}-postgres
+    container_name: infisical
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    environment:
+      - NODE_ENV=production
+      - ENCRYPTION_KEY=${INFISICAL_ENCRYPTION_KEY}
+      - AUTH_SECRET=${INFISICAL_AUTH_SECRET}
+      - SITE_URL=${INFISICAL_SITE_URL}
+      - DB_CONNECTION_URI=${INFISICAL_DB_CONNECTION_URI}
+      - REDIS_URL=${INFISICAL_REDIS_URL}
+    ports:
+      - "127.0.0.1:8086:8080"
+    networks:
+      - backend
+      - db
+    restart: unless-stopped
+    labels:
+      - wud.tag.include=^v\d+\.\d+\.\d+-postgres$$
+      - traefik.enable=true
+      - traefik.http.routers.infisical-infisical.middlewares=ipallowlist@docker
+      - traefik.http.services.infisical-infisical.Loadbalancer.server.port=8080
+
+  redis:
+    image: redis:${REDIS_VERSION}-alpine
+    container_name: infisical-redis
+    volumes:
+      - redis_data:/data
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    ports:
+      - "127.0.0.1:6379:6379"
+    networks:
+      - db
+    restart: unless-stopped
+    labels:
+      - wud.tag.include=^\d+\.\d+\.\d+-alpine$$
+      - traefik.enable=false
+
+networks:
+  backend:
+    driver: bridge
+    external: true
+  db:
+    driver: bridge
+    external: false
+
+volumes:
+  pg_data:
+  redis_data:
