@@ -23,7 +23,7 @@ services:
       - traefik.enable=false
   
   infisical:
-    image: infisical/infisical:v${INFISICAL_VERSION}-postgres
+    image: infisical/infisical:v${INFISICAL_VERSION}
     container_name: infisical
     depends_on:
       db:
@@ -50,7 +50,7 @@ services:
       - db
     restart: unless-stopped
     labels:
-      - wud.tag.include=^v\d+\.\d+\.\d+-postgres$$
+      - wud.tag.include=^v\d+\.\d+\.\d+$$
       - traefik.enable=true
       - traefik.http.routers.infisical-infisical.middlewares=ipallowlist@docker
       - traefik.http.services.infisical-infisical.Loadbalancer.server.port=8080
