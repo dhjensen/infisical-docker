@@ -44,7 +44,7 @@ services:
       - SMTP_FROM_ADDRESS=${INFISICAL_SMTP_FROM_ADDRESS}
       - SMTP_REQUIRE_TLS=${INFISICAL_SMTP_REQUIRE_TLS}
     ports:
-      - "127.0.0.1:8086:8080"
+      - '127.0.0.1:8086:8080'
     networks:
       - backend
       - db
@@ -63,7 +63,7 @@ services:
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
     ports:
-      - "127.0.0.1:6379:6379"
+      - '127.0.0.1:6379:6379'
     networks:
       - db
     restart: unless-stopped
