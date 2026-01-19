@@ -23,7 +23,7 @@ services:
       - traefik.enable=false
   
   infisical:
-    image: infisical/infisical:v${INFISICAL_VERSION}-postgres
+    image: infisical/infisical:v${INFISICAL_VERSION}
     container_name: infisical
     depends_on:
       db:
@@ -44,13 +44,13 @@ services:
       - SMTP_FROM_ADDRESS=${INFISICAL_SMTP_FROM_ADDRESS}
       - SMTP_REQUIRE_TLS=${INFISICAL_SMTP_REQUIRE_TLS}
     ports:
-      - "127.0.0.1:8086:8080"
+      - '127.0.0.1:8086:8080'
     networks:
       - backend
       - db
     restart: unless-stopped
     labels:
-      - wud.tag.include=^v\d+\.\d+\.\d+-postgres$$
+      - wud.tag.include=^v\d+\.\d+\.\d+$$
       - traefik.enable=true
       - traefik.http.routers.infisical-infisical.middlewares=ipallowlist@docker
       - traefik.http.services.infisical-infisical.Loadbalancer.server.port=8080
@@ -63,7 +63,7 @@ services:
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
     ports:
-      - "127.0.0.1:6379:6379"
+      - '127.0.0.1:6379:6379'
     networks:
       - db
     restart: unless-stopped
